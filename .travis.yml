@@ -1,0 +1,36 @@
+language: generic
+sudo: required
+services:
+  - docker
+
+before_install:
+  - docker build -t brianquigley/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true brianquigley/react-test npm test -- --coverage
+
+after_success:
+  - docker build -t brianquigley/multi-client ./client
+  - docker build -t brianquigley/multi-nginx  ./nginx
+  - docker build -t brianquigley/multi-server ./server
+  - docker build -t brianquigley/multi-worker ./worker
+  # Log in to the docker CLI
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to Docker Hub
+  - docker push brianquigley/multi-client
+  - docker push brianquigley/multi-nginx
+  - docker push brianquigley/multi-server
+  - docker push brianquigley/multi-worker
+
+deploy:
+  provider: elasticbeanstack
+  region: "us-east-2"
+  app: "docker-react"
+  env: "DockerReact-env"
+  bucket_name: "elasticbeanstalk-us-east-2-990684804326"
+  bucket_path: "docker-react"
+  on:
+    branch: master
+    access_key_od: $AWS_ACCESS_KEY
+    secret_access_key:
+      secure: "$AWS_SECRET_KEY"
