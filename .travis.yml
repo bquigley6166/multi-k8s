@@ -24,7 +24,7 @@ after_success:
 
 
 deploy:
-  provider: elasticbeanstack
+  provider: elasticbeanstalk
   region: "us-east-2"
   app: "multi-docker"
   env: "MultiDocker-env"
