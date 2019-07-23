@@ -22,15 +22,3 @@ after_success:
   - docker push brianquigley/multi-server
   - docker push brianquigley/multi-worker
 
-deploy:
-  provider: elasticbeanstack
-  region: "us-east-2"
-  app: "docker-react"
-  env: "DockerReact-env"
-  bucket_name: "elasticbeanstalk-us-east-2-990684804326"
-  bucket_path: "docker-react"
-  on:
-    branch: master
-    access_key_od: $AWS_ACCESS_KEY
-    secret_access_key:
-      secure: "$AWS_SECRET_KEY"
